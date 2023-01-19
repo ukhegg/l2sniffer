@@ -14,7 +14,13 @@ public abstract class UniversalPacketHandlerBase<TPacket, TPayloadTypeEnum> : IP
     {
         _packetHandlerProvider = packetHandlerProvider;
         var values = Enum.GetValues(typeof(TPayloadTypeEnum));
-        _handlers = new object[Enum.GetValues(typeof(TPayloadTypeEnum)).Cast<TPayloadTypeEnum>().Max().ToInt32(null)];
+        var maxEnumValue = Enum.GetValues(typeof(TPayloadTypeEnum)).Cast<TPayloadTypeEnum>().Max();
+        if (maxEnumValue == null)
+        {
+            throw new ArgumentException("cannot detect enum max value");
+        }
+
+        _handlers = new object[maxEnumValue.ToInt32(null)];
     }
 
     public void HandlePacket(TPacket packet, PacketMetainfo metainfo)

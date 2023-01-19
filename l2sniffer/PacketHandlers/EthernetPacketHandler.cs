@@ -12,7 +12,8 @@ public class EthernetPacketHandler : UniversalPacketHandlerBase<EthernetPacket, 
 
     protected override void UpdateMetainfo(EthernetPacket packet, PacketMetainfo packetMetainfo)
     {
-        packetMetainfo.SetEthernetDirection(packet.SourceHardwareAddress, packet.DestinationHardwareAddress);
+        packetMetainfo.EthernetDirection = new EthernetDirection(packet.SourceHardwareAddress,
+                                                                 packet.DestinationHardwareAddress);
     }
 
     protected override EthernetType GetPayloadType(EthernetPacket packet)
