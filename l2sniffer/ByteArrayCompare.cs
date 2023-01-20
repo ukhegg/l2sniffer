@@ -1,6 +1,7 @@
 ﻿namespace L2sniffer;
 
-class ByteArrayCompare : IComparer<byte[]>
+
+abstract class ByteArrayCompare : IComparer<byte[]>
 {
     public static int StaticCompare(byte[]? b1, byte[]? b2)
     {

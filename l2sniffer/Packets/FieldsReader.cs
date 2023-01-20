@@ -1,4 +1,6 @@
-﻿namespace L2sniffer.Packets.LS;
+﻿using System.Runtime.InteropServices;
+
+namespace L2sniffer.Packets;
 
 public ref struct FieldsReader
 {
@@ -18,24 +20,34 @@ public ref struct FieldsReader
     public void Read(out UInt16 val)
     {
         val = BitConverter.ToUInt16(_packetData);
-        _packetData = _packetData.Slice(2);
+        _packetData = _packetData[2..];
     }
 
     public void Read(out UInt32 val)
     {
         val = BitConverter.ToUInt32(_packetData);
-        _packetData = _packetData.Slice(4);
+        _packetData = _packetData[4..];
     }
 
     public void Read(out UInt64 val)
     {
         val = BitConverter.ToUInt64(_packetData);
-        _packetData = _packetData.Slice(8);
+        _packetData = _packetData[8..];
     }
 
     public void Read(out double val)
     {
         val = BitConverter.ToDouble(_packetData);
-        _packetData = _packetData.Slice(sizeof(double));
+        _packetData = _packetData[sizeof(double)..];
+    }
+
+    public void Skip<T>() where T : unmanaged
+    {
+        Skip(Marshal.SizeOf<T>());
+    }
+
+    public void Skip(int bytes)
+    {
+        _packetData = _packetData[bytes..];
     }
 }

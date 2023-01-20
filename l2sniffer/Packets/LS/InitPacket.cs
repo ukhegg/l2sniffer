@@ -1,6 +1,6 @@
 ﻿namespace L2sniffer.Packets.LS;
 
-public class InitPacket : L2PacketBase
+public class InitPacket : LoginServerPacketBase
 {
     private UInt32 _sessionId;
     private UInt32 _protocolVersion;

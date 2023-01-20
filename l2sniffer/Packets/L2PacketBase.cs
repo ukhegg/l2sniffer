@@ -22,6 +22,8 @@ public class L2PacketBase
         ReadPayloadFields(fieldsReader);
     }
 
+    public ReadOnlySpan<byte> PayloadBytes => Bytes[2..];
+
     public ReadOnlySpan<byte> Bytes => new(_bytes);
 
     public UInt16 Length => BitConverter.ToUInt16(Bytes);
@@ -30,5 +32,10 @@ public class L2PacketBase
 
     protected virtual void ReadPayloadFields(FieldsReader fieldsReader)
     {
+    }
+
+    public T? As<T>() where T : L2PacketBase
+    {
+        return (T)Activator.CreateInstance(typeof(T), this._bytes)!;
     }
 }
