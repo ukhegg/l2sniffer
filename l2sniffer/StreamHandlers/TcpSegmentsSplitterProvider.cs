@@ -6,18 +6,13 @@ namespace L2sniffer.StreamHandlers;
 public class TcpSegmentsSplitterProvider : ITcpStreamHandlerProvider
 {
     private IDatagramStreamReaderProvider _streamReaderProvider;
+    private IDatagramStreamHandlerProvider _datagramStreamHandlerProvider;
 
-    public TcpSegmentsSplitterProvider(IDatagramStreamReaderProvider streamReaderProvider)
+    public TcpSegmentsSplitterProvider(IDatagramStreamReaderProvider streamReaderProvider,
+                                       IDatagramStreamHandlerProvider datagramStreamHandlerProvider)
     {
         _streamReaderProvider = streamReaderProvider;
-    }
-
-    class DummyDatagramHandler : IDatagramStreamHandler
-    {
-        public void HandleDatagram(byte[] datagram)
-        {
-            Console.WriteLine($"handling datagram {datagram.Length} bytes");
-        }
+        _datagramStreamHandlerProvider = datagramStreamHandlerProvider;
     }
 
 
@@ -27,6 +22,7 @@ public class TcpSegmentsSplitterProvider : ITcpStreamHandlerProvider
                                        ports,
                                        _streamReaderProvider.GetStreamReader(ipDirection,
                                                                              ports),
-                                       new DummyDatagramHandler());
+                                       _datagramStreamHandlerProvider.GetDatagramHandler(ipDirection,
+                                                                                         ports));
     }
 }

@@ -37,7 +37,7 @@ public class TcpSegmentsSplitter : IPacketHandler<TcpPacket>
             }
 
             var recordAndLeft = Split(_pendingBytes, recordLength);
-            _datagramHandler.HandleDatagram(recordAndLeft.Item1);
+            _datagramHandler.HandleDatagram(recordAndLeft.Item1, metainfo);
             _pendingBytes = recordAndLeft.Item2;
         }
     }

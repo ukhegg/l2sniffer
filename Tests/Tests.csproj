@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="LightInject" Version="6.6.3" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
         <PackageReference Include="NUnit" Version="3.13.3" />
         <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
@@ -16,6 +17,16 @@
         <PackageReference Include="coverlet.collector" Version="3.1.2" />
         <PackageReference Include="PacketDotNet" Version="1.4.8-pre15" />
         <PackageReference Include="SharpPcap" Version="6.2.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\L2sniffer\L2sniffer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="test files\l2-1.pcap">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

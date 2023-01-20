@@ -2,8 +2,11 @@
 
 namespace L2sniffer;
 
-public class PacketHandlerProvider : IPacketHandlerProvider
+public class PacketHandlerProvider : IPacketHandlerProvider,
+    IPacketHandlerRegistry
 {
+    public string Uuid = Guid.NewGuid().ToString();
+
     interface IGetterBase
     {
     }

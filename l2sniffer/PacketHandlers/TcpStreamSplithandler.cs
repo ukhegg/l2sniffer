@@ -36,7 +36,7 @@ public class TcpStreamSplitHandler : IPacketHandler<TcpPacket>
 
     public void HandlePacket(TcpPacket packet, PacketMetainfo metainfo)
     {
-        metainfo.TransportDirection = new TransportDirection(packet.SourcePort,
+        metainfo.TransportPorts = new TransportDirection(packet.SourcePort,
                                                              packet.DestinationPort);
         if (metainfo.TopLevelIpDirection == null)
         {
@@ -50,12 +50,12 @@ public class TcpStreamSplitHandler : IPacketHandler<TcpPacket>
         }
 
         StreamData streamData;
-        if (!ipConversationData.Streams.TryGetValue(metainfo.TransportDirection, out streamData))
+        if (!ipConversationData.Streams.TryGetValue(metainfo.TransportPorts, out streamData))
         {
             var handler = _handlerProvider.GetStreamHandler(metainfo.TopLevelIpDirection,
-                                                            metainfo.TransportDirection);
+                                                            metainfo.TransportPorts);
             streamData = new StreamData(handler);
-            ipConversationData.Streams[metainfo.TransportDirection] = streamData;
+            ipConversationData.Streams[metainfo.TransportPorts] = streamData;
         }
 
         streamData.PacketHandler.HandlePacket(packet, metainfo);

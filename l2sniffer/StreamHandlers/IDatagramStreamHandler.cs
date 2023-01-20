@@ -2,5 +2,5 @@
 
 public interface IDatagramStreamHandler
 {
-    void HandleDatagram(byte[] datagram);
+    void HandleDatagram(byte[] datagram, PacketMetainfo metainfo);
 }

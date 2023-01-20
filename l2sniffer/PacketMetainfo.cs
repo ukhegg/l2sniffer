@@ -12,17 +12,10 @@ public class PacketMetainfo
     public PosixTimeval? CaptureTime { get; set; }
 
     public EthernetDirection? EthernetDirection { get; set; }
-    
-    public IpDirection? TopLevelIpDirection
-    {
-        get
-        {
-            if (_ipDirections == null) return null;
-            return _ipDirections.Last();
-        }
-    }
 
-    public TransportDirection? TransportDirection { get; set; }
+    public IpDirection? TopLevelIpDirection => _ipDirections?.Last();
+
+    public TransportDirection? TransportPorts { get; set; }
 
 
     public void AddIpDirection(IPAddress src, IPAddress dst)

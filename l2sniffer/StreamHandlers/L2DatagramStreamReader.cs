@@ -6,7 +6,6 @@ public class L2DatagramStreamReader : IDatagramStreamReader
 {
     public static IDatagramStreamReader Instance = new L2DatagramStreamReader();
 
-    public static IDatagramStreamReaderProvider Provider = new ProviderImpl();
     public uint HeaderLength => 2;
 
     public uint GetRecordLength(byte[] headerBytes)
@@ -14,7 +13,7 @@ public class L2DatagramStreamReader : IDatagramStreamReader
         return BitConverter.ToUInt16(headerBytes, 0);
     }
 
-    class ProviderImpl : IDatagramStreamReaderProvider
+    public class Provider : IDatagramStreamReaderProvider
     {
         public IDatagramStreamReader GetStreamReader(IpDirection ipDirection, TransportDirection ports)
         {

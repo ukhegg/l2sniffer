@@ -2,30 +2,30 @@
 
 namespace l2sniffer.PacketHandlers;
 
-class StreamId : IComparable<StreamId>,
+public class StreamId : IComparable<StreamId>,
     IEquatable<StreamId>
 {
-    public StreamId(IpDirection ipDirection, TransportDirection transportDirection)
+    public StreamId(IpDirection ipDirection, TransportDirection ports)
     {
         IpDirection = ipDirection;
-        TransportDirection = transportDirection;
+        Ports = ports;
     }
 
     public readonly IpDirection IpDirection;
-    public readonly TransportDirection TransportDirection;
+    public readonly TransportDirection Ports;
 
     public int CompareTo(StreamId rhs)
     {
         var c1 = IpDirection.CompareTo(rhs.IpDirection);
         if (c1 != 0) return c1;
-        return TransportDirection.CompareTo(rhs.TransportDirection);
+        return Ports.CompareTo(rhs.Ports);
     }
 
     public bool Equals(StreamId? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return IpDirection.Equals(other.IpDirection) && TransportDirection.Equals(other.TransportDirection);
+        return IpDirection.Equals(other.IpDirection) && Ports.Equals(other.Ports);
     }
 
     public override bool Equals(object? obj)
@@ -38,6 +38,6 @@ class StreamId : IComparable<StreamId>,
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(IpDirection, TransportDirection);
+        return HashCode.Combine(IpDirection, Ports);
     }
 }
