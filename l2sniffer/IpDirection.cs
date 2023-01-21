@@ -9,7 +9,12 @@ public class IpDirection : Direction<IPAddress, IpDirection>
     {
     }
 
-    
+    public IpDirection(string source, string destination)
+        : base(IPAddress.Parse(source), IPAddress.Parse(destination))
+    {
+    }
+
+
     protected override int Compare(IPAddress lhs, IPAddress rhs)
     {
         if (lhs.AddressFamily != rhs.AddressFamily)

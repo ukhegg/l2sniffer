@@ -15,7 +15,7 @@ public class LoginSessionCipherTests
         var l2Packet = new L2PacketBase(packet.Item1);
 
 
-        var cipher = new LoginSessionCipher();
+        var cipher = new LoginSessionDecryptor();
         var decrypted = cipher.Decrypt(l2Packet.PayloadBytes.ToArray());
 
         Assert.That(

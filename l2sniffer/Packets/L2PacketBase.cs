@@ -28,7 +28,7 @@ public class L2PacketBase
 
     public UInt16 Length => BitConverter.ToUInt16(Bytes);
 
-    protected byte PacketTypeRaw { get; }
+    public byte PacketTypeRaw { get; }
 
     protected virtual void ReadPayloadFields(FieldsReader fieldsReader)
     {

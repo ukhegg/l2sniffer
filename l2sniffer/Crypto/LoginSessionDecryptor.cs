@@ -5,7 +5,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 namespace L2sniffer.Crypto;
 
-public class LoginSessionCipher : L2PacketDecryptorBase
+public class LoginSessionDecryptor : L2PacketDecryptorBase
 {
     private IBlockCipher _cipher;
 
@@ -16,7 +16,7 @@ public class LoginSessionCipher : L2PacketDecryptorBase
         0x21, 0x5E, 0x5B, 0x24, 0x00
     };
 
-    public LoginSessionCipher()
+    public LoginSessionDecryptor()
     {
         var engine = new BlowfishEngine();
         engine.Init(false, new KeyParameter(_cipherKey));

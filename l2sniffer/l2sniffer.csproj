@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <Folder Include="Packets\GC" />
-      <Folder Include="Packets\GS" />
       <Folder Include="Packets\LC" />
     </ItemGroup>
 

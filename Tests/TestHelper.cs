@@ -93,9 +93,27 @@ public class TestHelper
         }
     }
 
+    public List<byte[]> GetL2Packets(string file, StreamId streamId)
+    {
+        var result = new List<byte[]>();
+        foreach (var tuple in GetL2Packets(file))
+        {
+            if (!tuple.Item2.Equals(streamId)) continue;
+            result.Add(tuple.Item1);
+        }
+
+        return result;
+    }
+
+
     public Tuple<byte[], StreamId> GetL2Packet(string file, int index)
     {
         var datagrams = GetL2Packets(file);
         return datagrams[index];
+    }
+
+    public byte[] GetL2Packet(string file, StreamId streamId, int index)
+    {
+        return GetL2Packets(file, streamId)[index];
     }
 }
