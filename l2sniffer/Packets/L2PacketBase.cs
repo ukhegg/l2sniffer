@@ -1,7 +1,4 @@
-﻿using L2sniffer.Packets.LS;
-using PacketDotNet.Utils;
-
-namespace L2sniffer.Packets;
+﻿namespace L2sniffer.Packets;
 
 public class L2PacketBase
 {
