@@ -45,6 +45,15 @@ public class StreamId : IComparable<StreamId>,
         Ports = ports;
     }
 
+    public IPEndPoint SrcEndpoint => new IPEndPoint(IpDirection.Source, Ports.Source);
+
+    public IPEndPoint DstEndpoint => new IPEndPoint(IpDirection.Destination, Ports.Destination);
+
+    public StreamId Reverse()
+    {
+        return new StreamId(IpDirection.Reverse(), Ports.Reverse());
+    }
+
     public readonly IpDirection IpDirection;
     public readonly TransportDirection Ports;
 

@@ -3,4 +3,6 @@
 public interface IDatagramStreamHandler
 {
     void HandleDatagram(byte[] datagram, PacketMetainfo metainfo);
+
+    void HandleMissingInterval(uint loweBound, uint upperBound);
 }

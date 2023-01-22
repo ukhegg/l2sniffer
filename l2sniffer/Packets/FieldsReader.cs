@@ -1,14 +1,35 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace L2sniffer.Packets;
 
 public ref struct FieldsReader
 {
+    public enum StringType
+    {
+        Ansii,
+        Wide
+    }
+
     private ReadOnlySpan<byte> _packetData;
 
     public FieldsReader(ReadOnlySpan<byte> packetData)
     {
         _packetData = packetData;
+    }
+
+    public void Read(out string val, StringType stringType = StringType.Wide)
+    {
+        var chars = new List<char>();
+        ushort nextSymbol;
+        Read(out nextSymbol);
+        while (nextSymbol != 0)
+        {
+            chars.Add(Convert.ToChar(nextSymbol));
+            Read(out nextSymbol);
+        }
+
+        val = new string(chars.ToArray());
     }
 
     public void Read(out byte val)
@@ -17,28 +38,125 @@ public ref struct FieldsReader
         _packetData = _packetData.Slice(1);
     }
 
-    public void Read(out UInt16 val)
+    public void Read(ref byte[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
+    }
+
+    public void Read(out ushort val)
     {
         val = BitConverter.ToUInt16(_packetData);
         _packetData = _packetData[2..];
     }
 
-    public void Read(out UInt32 val)
+    public void Read(ref ushort[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
+    }
+
+    public void Read(out short val)
+    {
+        val = BitConverter.ToInt16(_packetData);
+        _packetData = _packetData[2..];
+    }
+
+    public void Read(ref short[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
+    }
+
+    public void Read(out uint val)
     {
         val = BitConverter.ToUInt32(_packetData);
         _packetData = _packetData[4..];
     }
 
-    public void Read(out UInt64 val)
+    public void Read(ref uint[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
+    }
+
+    public void Read(out int val)
+    {
+        val = BitConverter.ToInt32(_packetData);
+        _packetData = _packetData[4..];
+    }
+
+    public void Read(ref int[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
+    }
+
+    public void Read(out ulong val)
     {
         val = BitConverter.ToUInt64(_packetData);
         _packetData = _packetData[8..];
+    }
+
+    public void Read(ref ulong[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
+    }
+
+    public void Read(out long val)
+    {
+        val = BitConverter.ToInt64(_packetData);
+        _packetData = _packetData[8..];
+    }
+
+    public void Read(ref long[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
     }
 
     public void Read(out double val)
     {
         val = BitConverter.ToDouble(_packetData);
         _packetData = _packetData[sizeof(double)..];
+    }
+
+    public void Read(ref double[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
+    }
+
+    public void Read<T>(out T val) where T : DataStruct?, new()
+    {
+        val = new T();
+        val.ReadFields(ref this);
+    }
+
+    public void Read<T>(T[] array) where T : DataStruct?, new()
+    {
+        if (array == null) throw new ArgumentException("array must not be null");
+        for (int i = 0; i < array.Length; ++i)
+        {
+            Read(out array[i]);
+        }
     }
 
     public void Skip<T>() where T : unmanaged

@@ -22,7 +22,6 @@ public class ServerListPacket : LoginServerPacketBase
     {
         fieldsReader.Read(out byte serversCount);
         fieldsReader.Read(out byte reserved);
-        Servers = new List<ServerInfo>();
 
         for (var i = 0; i < serversCount; ++i)
         {
@@ -39,5 +38,5 @@ public class ServerListPacket : LoginServerPacketBase
         }
     }
 
-    public List<ServerInfo> Servers { get; private set; }
+    public List<ServerInfo> Servers { get; } = new();
 }

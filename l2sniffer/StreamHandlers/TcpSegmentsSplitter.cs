@@ -1,9 +1,8 @@
 ﻿using l2sniffer.PacketHandlers;
-using PacketDotNet;
 
 namespace L2sniffer.StreamHandlers;
 
-public class TcpSegmentsSplitter : IPacketHandler<TcpPacket>
+public class TcpSegmentsSplitter : IDatagramStreamHandler
 {
     private IDatagramStreamReader _streamReader;
     private IDatagramStreamHandler _datagramHandler;
@@ -25,9 +24,10 @@ public class TcpSegmentsSplitter : IPacketHandler<TcpPacket>
 
     public IpDirection IpDir { get; }
 
-    public void HandlePacket(TcpPacket packet, PacketMetainfo metainfo)
+    public void HandleDatagram(byte[] datagram, PacketMetainfo metainfo)
     {
-        _pendingBytes = Concat(_pendingBytes, packet.PayloadData);
+        if (datagram.Length == 0) return;
+        _pendingBytes = Concat(_pendingBytes, datagram);
         while (_pendingBytes.Length > _streamReader.HeaderLength)
         {
             var recordLength = _streamReader.GetRecordLength(_pendingBytes);
@@ -42,6 +42,11 @@ public class TcpSegmentsSplitter : IPacketHandler<TcpPacket>
         }
     }
 
+    public void HandleMissingInterval(uint loweBound, uint upperBound)
+    {
+        _datagramHandler.HandleMissingInterval(loweBound, upperBound);
+    }
+    
     private byte[] Concat(byte[] x, byte[] y)
     {
         if (x.Length == 0) return y;

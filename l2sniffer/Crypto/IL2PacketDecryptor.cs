@@ -15,7 +15,7 @@ public static class L2PacketDecryptorExtension
         return new L2PacketBase(decryptor.DecryptPacket(packet.Bytes));
     }
 
-    public static T DecryptPacket<T>(this IL2PacketDecryptor decryptor, ReadOnlySpan<byte> packetBytes)
+    public static T DecryptPacket<T>(this IL2PacketDecryptor? decryptor, ReadOnlySpan<byte> packetBytes)
         where T : L2PacketBase
     {
         byte[] decryptedBytes = decryptor.DecryptPacket(packetBytes);

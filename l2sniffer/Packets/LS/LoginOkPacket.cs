@@ -24,6 +24,6 @@ public class LoginOkPacket : LoginServerPacketBase
         fieldsReader.Skip<uint>();
         fieldsReader.Read(out _sig1);
         fieldsReader.Skip<uint>();
-        fieldsReader.Skip<uint>();
+        fieldsReader.Read(out _sig2);
     }
 }

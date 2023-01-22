@@ -1,9 +1,8 @@
 ﻿using l2sniffer.PacketHandlers;
-using PacketDotNet;
 
 namespace L2sniffer.StreamHandlers;
 
-public class TcpSegmentsSplitterProvider : ITcpStreamHandlerProvider
+public class TcpSegmentsSplitterProvider : IDatagramStreamHandlerProvider
 {
     private IDatagramStreamReaderProvider _streamReaderProvider;
     private IDatagramStreamHandlerProvider _datagramStreamHandlerProvider;
@@ -16,7 +15,12 @@ public class TcpSegmentsSplitterProvider : ITcpStreamHandlerProvider
     }
 
 
-    public IPacketHandler<TcpPacket> GetStreamHandler(IpDirection ipDirection, TransportDirection ports)
+    public IDatagramStreamHandler GetDatagramHandler(StreamId streamId)
+    {
+        return GetDatagramHandler(streamId.IpDirection, streamId.Ports);
+    }
+
+    public IDatagramStreamHandler GetDatagramHandler(IpDirection ipDirection, TransportDirection ports)
     {
         return new TcpSegmentsSplitter(ipDirection,
                                        ports,

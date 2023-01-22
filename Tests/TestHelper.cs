@@ -1,4 +1,6 @@
 ﻿using L2sniffer;
+using L2sniffer.Crypto;
+using L2sniffer.L2PacketHandlers;
 using l2sniffer.PacketHandlers;
 using L2sniffer.PacketHandlers;
 using L2sniffer.StreamHandlers;
@@ -28,6 +30,11 @@ public class TestHelper
                 _datagrams.Add(new Tuple<byte[], StreamId>(datagram,
                                                            new StreamId(metainfo.TopLevelIpDirection,
                                                                         metainfo.TransportPorts)));
+            }
+
+            public void HandleMissingInterval(uint loweBound, uint upperBound)
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -63,16 +70,24 @@ public class TestHelper
             device.Open();
 
             IKernel kernel = new StandardKernel();
+            //l2 handlers
+            var decryptorProvider = kernel.Get<PacketDecryptorProvider>();
+            kernel.Bind<IPacketDecryptorProvider>().ToMethod(context => decryptorProvider);
+            kernel.Bind<ISessionCryptKeysRegistry>().ToMethod(context => decryptorProvider);
+            kernel.Bind<IDatagramStreamReaderProvider>().To<L2DatagramStreamReader.Provider>();
+            
+            //packet handlers bindings
             kernel.Bind<IPacketHandler<EthernetPacket>>().To<EthernetPacketHandler>();
             kernel.Bind<IPacketHandler<IPv4Packet>>().To<IpV4PacketHandler>();
-            kernel.Bind<IPacketHandler<TcpPacket>>().To<TcpStreamSplitHandler>();
-            kernel.Bind<ITcpStreamHandlerProvider>().To<TcpSegmentsSplitterProvider>();
+            kernel.Bind<ITcpAssemblerProvider>().To<TcpReordererProvider>();
+            kernel.Bind<IPacketHandler<TcpPacket>>().To<TcpStreamSplitter>();
 
-            kernel.Bind<IDatagramStreamReaderProvider>().To<L2DatagramStreamReader.Provider>();
-
+            //datagam handlers
             var datagramAccumulator = kernel.Get<DatagramAccumulator>();
-            kernel.Bind<IDatagramStreamHandlerProvider>().ToMethod(context => datagramAccumulator);
-
+            kernel.Bind<IDatagramStreamHandlerProvider>().ToMethod(context => datagramAccumulator)
+                .WhenInjectedInto<TcpSegmentsSplitterProvider>();
+            kernel.Bind<IDatagramStreamHandlerProvider>().To<TcpSegmentsSplitterProvider>()
+                .WhenInjectedInto<TcpStreamSplitter>();
 
             var packetHandlerProvider = kernel.Get<PacketHandlerProvider>();
             kernel.Bind<IPacketHandlerProvider>().ToMethod(context => packetHandlerProvider);
@@ -82,6 +97,9 @@ public class TestHelper
             handlerRegistry.RegisterPacketHandler(kernel.Get<IPacketHandler<EthernetPacket>>());
             handlerRegistry.RegisterPacketHandler(kernel.Get<IPacketHandler<IPv4Packet>>());
             handlerRegistry.RegisterPacketHandler(kernel.Get<IPacketHandler<TcpPacket>>());
+
+
+            
 
             kernel.Get<CaptureProcessor>().ProcessCapture(device);
             return datagramAccumulator.Datagrams;
@@ -104,8 +122,7 @@ public class TestHelper
 
         return result;
     }
-
-
+    
     public Tuple<byte[], StreamId> GetL2Packet(string file, int index)
     {
         var datagrams = GetL2Packets(file);
@@ -115,5 +132,34 @@ public class TestHelper
     public byte[] GetL2Packet(string file, StreamId streamId, int index)
     {
         return GetL2Packets(file, streamId)[index];
+    }
+
+    public List<byte[]> GetL2Packets(string file, StreamId streamId,
+                                     IL2PacketDecryptor decryptor,
+                                     bool skipFirst = true)
+    {
+        var packets = GetL2Packets(file, streamId);
+        var result = new List<byte[]>();
+        for (var i = 0; i < packets.Count; ++i)
+        {
+            if (i == 0 && skipFirst)
+            {
+                result.Add(packets[0]);
+            }
+            else
+            {
+                result.Add(decryptor.DecryptPacket(packets[i]));
+            }
+        }
+
+        return result;
+    }
+
+    public byte[] GetL2Packet(string file, StreamId streamId,
+                              IL2PacketDecryptor decryptor,
+                              int index,
+                              bool skipFirst = true)
+    {
+        return GetL2Packets(file, streamId, decryptor, skipFirst)[index];
     }
 }
