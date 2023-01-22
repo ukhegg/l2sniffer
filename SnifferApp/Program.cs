@@ -53,6 +53,7 @@ namespace SnifferApp
             
             //infrustructure
             kernel.Bind<IL2PacketLogger>().To<ConsoleWritingPacketLogger>();
+            kernel.Bind<IL2ServerRegistry>().To<L2ServerRegistry>().InSingletonScope();
             
             //packet handlers bindings
             kernel.Bind<IPacketHandler<EthernetPacket>>().To<EthernetPacketHandler>();
@@ -64,7 +65,6 @@ namespace SnifferApp
             var l2DatagramHandlerProvider = kernel.Get<L2DatagramHandlerProvider>();
             kernel.Bind<IDatagramStreamHandlerProvider>().ToMethod(context => l2DatagramHandlerProvider)
                 .WhenInjectedInto<TcpSegmentsSplitterProvider>();
-            kernel.Bind<IL2ServerRegistry>().ToMethod(context => l2DatagramHandlerProvider);
             kernel.Bind<IDatagramStreamHandlerProvider>().To<TcpSegmentsSplitterProvider>()
                 .WhenInjectedInto<TcpStreamSplitter>();
 
@@ -81,7 +81,7 @@ namespace SnifferApp
             kernel.Get<IL2ServerRegistry>().RegisterLoginServer(
                 new IPEndPoint(IPAddress.Parse("83.166.99.220"), 2106));
             
-            kernel.Get<CaptureProcessor>().ProcessCapture(device);
+            kernel.Get<CaptureProcessor>().ProcessCapture(device, 0, 100);
         }
     }
 }

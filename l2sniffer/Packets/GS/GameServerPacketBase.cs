@@ -1,10 +1,10 @@
-﻿namespace L2sniffer.Packets.GS;
+﻿using System.Data;
 
-public class GameServerPacketBase : L2PacketBase
+namespace L2sniffer.Packets.GS;
+
+public class GameServerPacketBase : TypeL2PacketBase<GameServerPacketTypes>
 {
     public GameServerPacketBase(byte[] bytes) : base(bytes)
     {
     }
-
-    public GameServerPacketTypes PacketType => (GameServerPacketTypes)PacketTypeRaw;
 }
