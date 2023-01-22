@@ -16,14 +16,8 @@ namespace SnifferApp
     {
         public static void Main(string[] args)
         {
-            var ver = Pcap.SharpPcapVersion;
-
-            /* Print SharpPcap version */
-            Console.WriteLine("SharpPcap {0}, ReadingCaptureFile", ver);
+            Console.WriteLine($"SharpPcap {Pcap.SharpPcapVersion}, ReadingCaptureFile");
             Console.WriteLine();
-
-            Console.WriteLine();
-
             // read the file from stdin or from the command line arguments
             string capFile = "C:/Games/l2big.pcap";
             Console.WriteLine("opening '{0}'", capFile);
@@ -82,6 +76,9 @@ namespace SnifferApp
                 new IPEndPoint(IPAddress.Parse("83.166.99.220"), 2106));
             
             kernel.Get<CaptureProcessor>().ProcessCapture(device, 0, 100);
+            
+            Console.WriteLine();
+            Console.WriteLine("Read done!");
         }
     }
 }

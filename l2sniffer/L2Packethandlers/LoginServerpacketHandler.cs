@@ -1,11 +1,12 @@
 ﻿using System.Net;
 using L2sniffer.Crypto;
 using l2sniffer.PacketHandlers;
+using L2sniffer.Packets;
 using L2sniffer.Packets.LS;
 
 namespace L2sniffer.L2PacketHandlers;
 
-public class LoginServerPacketHandler : L2PacketHandlerBase<LoginServerPacketBase>
+public class LoginServerPacketHandler : L2PacketHandlerBase<LoginServerPacketBase, LoginServerPacketTypes>
 {
     private IL2ServerRegistry _serverRegistry;
 
@@ -18,49 +19,29 @@ public class LoginServerPacketHandler : L2PacketHandlerBase<LoginServerPacketBas
         _serverRegistry = serverRegistry;
     }
 
-    protected override void ProcessPacket(LoginServerPacketBase packet)
+    protected override void RegisterHandlers(IHandlersRegistry handlersRegistry)
     {
-        switch (packet.PacketType)
-        {
-            case LoginServerPacketTypes.Init:
-                HandlePacket(packet.As<InitPacket>());
-                break;
-            case LoginServerPacketTypes.LogicFail:
-                break;
-            case LoginServerPacketTypes.AccountKicked:
-                break;
-            case LoginServerPacketTypes.LoginOk:
-                HandlePacket(packet.As<LoginOkPacket>());
-                break;
-            case LoginServerPacketTypes.ServerList:
-                HandlePacket(packet.As<ServerListPacket>());
-                break;
-            case LoginServerPacketTypes.PlayFail:
-                break;
-            case LoginServerPacketTypes.PlayOk:
-                HandlePacket(packet.As<PlayOkPacket>());
-                break;
-            case LoginServerPacketTypes.GgAuth:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        handlersRegistry.RegisterHandler<InitPacket>(LoginServerPacketTypes.Init, HandlePacket);
+        handlersRegistry.RegisterHandler<LoginOkPacket>(LoginServerPacketTypes.LoginOk, HandlePacket);
+        handlersRegistry.RegisterHandler<ServerListPacket>(LoginServerPacketTypes.ServerList, HandlePacket);
+        handlersRegistry.RegisterHandler<PlayOkPacket>(LoginServerPacketTypes.PlayOk, HandlePacket);
     }
 
-    protected override IL2PacketDecryptor GetDecryptor(IPacketDecryptorProvider decryptorProvider, StreamId streamId)
+    protected override IL2PacketDecryptor SelectDecryptor(IPacketDecryptorProvider decryptorProvider,
+                                                          StreamId streamId)
     {
         return decryptorProvider.GetLoginSessionDecryptor(streamId);
     }
 
-    private void HandlePacket(InitPacket? initPacket)
+    private void HandlePacket(InitPacket initPacket, PacketMetainfo metainfo)
     {
     }
 
-    private void HandlePacket(LoginOkPacket? initPacket)
+    private void HandlePacket(LoginOkPacket initPacket, PacketMetainfo metainfo)
     {
     }
 
-    private void HandlePacket(ServerListPacket? initPacket)
+    private void HandlePacket(ServerListPacket initPacket, PacketMetainfo metainfo)
     {
         if (initPacket?.Servers == null) return;
         foreach (var serverInfo in initPacket.Servers)
@@ -69,7 +50,7 @@ public class LoginServerPacketHandler : L2PacketHandlerBase<LoginServerPacketBas
         }
     }
 
-    private void HandlePacket(PlayOkPacket? initPacket)
+    private void HandlePacket(PlayOkPacket initPacket, PacketMetainfo metainfo)
     {
     }
 }

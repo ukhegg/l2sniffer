@@ -4,7 +4,7 @@ using L2sniffer.Packets.GC;
 
 namespace L2sniffer.L2PacketHandlers;
 
-public class GameClientPacketHandler : L2PacketHandlerBase<GameClientPacketBase>
+public class GameClientPacketHandler : L2PacketHandlerBase<GameClientPacketBase, GameClientPacketTypes>
 {
     public GameClientPacketHandler(StreamId streamId,
                                    IPacketDecryptorProvider packetDecryptorProvider,
@@ -13,11 +13,11 @@ public class GameClientPacketHandler : L2PacketHandlerBase<GameClientPacketBase>
     {
     }
 
-    protected override void ProcessPacket(GameClientPacketBase packet)
+    protected override void RegisterHandlers(IHandlersRegistry handlersRegistry)
     {
     }
 
-    protected override IL2PacketDecryptor GetDecryptor(IPacketDecryptorProvider decryptorProvider, StreamId streamId)
+    protected override IL2PacketDecryptor SelectDecryptor(IPacketDecryptorProvider decryptorProvider, StreamId streamId)
     {
         return decryptorProvider.GetGameSessionDecryptor(streamId);
     }

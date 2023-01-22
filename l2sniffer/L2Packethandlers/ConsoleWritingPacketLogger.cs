@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Runtime.InteropServices;
 using L2sniffer.Packets;
 using L2sniffer.Packets.GC;
 using L2sniffer.Packets.GS;
@@ -18,7 +19,18 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
         _serverRegistry = serverRegistry;
     }
 
-    public void LogPacket(L2PacketBase packet, PacketMetainfo metainfo)
+    public void LogHandledPacket(L2PacketBase packet, PacketMetainfo metainfo)
+    {
+        LogPacket(packet, metainfo, true);
+    }
+
+    public void LogUnhandledPacket(L2PacketBase packet, PacketMetainfo metainfo)
+    {
+        LogPacket(packet, metainfo, false);
+    }
+
+
+    private void LogPacket(L2PacketBase packet, PacketMetainfo metainfo, bool isHandled)
     {
         try
         {
@@ -27,19 +39,19 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
                                              metainfo.TransportPorts.Destination);
             if (_serverRegistry.IsLoginServer(srcEndpoint))
             {
-                HandleLsToLc(packet.As<LoginServerPacketBase>(), metainfo);
+                HandlePacket(packet.As<LoginServerPacketBase>(), metainfo, isHandled);
             }
             else if (_serverRegistry.IsLoginServer(dstEndpoint))
             {
-                HandleLcToLs(packet.As<LoginClientPacketBase>(), metainfo);
+                HandlePacket(packet.As<LoginClientPacketBase>(), metainfo, isHandled);
             }
             else if (_serverRegistry.IsGameServer(srcEndpoint))
             {
-                HandleGsToGc(packet.As<GameServerPacketBase>(), metainfo);
+                HandlePacket(packet.As<GameServerPacketBase>(), metainfo, isHandled);
             }
             else if (_serverRegistry.IsGameServer(dstEndpoint))
             {
-                HandleGcToGs(packet.As<GameClientPacketBase>(), metainfo);
+                HandlePacket(packet.As<GameClientPacketBase>(), metainfo, isHandled);
             }
             else
             {
@@ -52,23 +64,56 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
         }
     }
 
-    private void HandleLsToLc(LoginServerPacketBase packet, PacketMetainfo metainfo)
+    private void HandlePacket<TPacketType>(TypeL2PacketBase<TPacketType> packet,
+                                           PacketMetainfo metainfo,
+                                           bool isHandled) where TPacketType : Enum
     {
-        Console.WriteLine($"#{_packetsLogged} Login  S --> C:  {packet.PacketType}  {packet.Bytes.Length} bytes");
+        var directionInfo = GetDirectionInfo<TPacketType>();
+        HandlePacket(directionInfo.Item3, directionInfo.Item1, directionInfo.Item2, directionInfo.Item4,
+                     packet,
+                     isHandled);
     }
 
-    private void HandleLcToLs(LoginClientPacketBase packet, PacketMetainfo metainfo)
+    private Tuple<string, string, string, string> GetDirectionInfo<TPacketType>() where TPacketType : Enum
     {
-        Console.WriteLine($"#{_packetsLogged} Login  C --> S:  {packet.PacketType}  {packet.Bytes.Length} bytes");
+        if (typeof(TPacketType) == typeof(GameServerPacketTypes))
+        {
+            return new("S", "C", "Game", "-->");
+        }
+
+        if (typeof(TPacketType) == typeof(GameClientPacketTypes))
+        {
+            return new("S", "C", "Game", "<--");
+        }
+
+        if (typeof(TPacketType) == typeof(LoginServerPacketTypes))
+        {
+            return new("S", "C", "Login", "-->");
+        }
+
+        if (typeof(TPacketType) == typeof(LoginClientPacketTypes))
+        {
+            return new("S", "C", "Login", "<--");
+        }
+
+        throw new ArgumentException("unknown packet type");
     }
 
-    private void HandleGsToGc(GameServerPacketBase packet, PacketMetainfo metainfo)
+    private void HandlePacket<TPacketType>(string sessionName,
+                                           string participant1,
+                                           string participant2,
+                                           string direction,
+                                           TypeL2PacketBase<TPacketType> packet,
+                                           bool isHandled) where TPacketType : Enum
     {
-        Console.WriteLine($"#{_packetsLogged} Game   S --> C:  {packet.PacketType}  {packet.Bytes.Length} bytes");
-    }
+        var handleStatus = isHandled ? '+' : '-';
 
-    private void HandleGcToGs(GameClientPacketBase packet, PacketMetainfo metainfo)
-    {
-        Console.WriteLine($"#{_packetsLogged} Game   C --> S:  {packet.PacketType}  {packet.Bytes.Length} bytes");
+        var packetTypeString = Enum.IsDefined(typeof(TPacketType), packet.PacketType)
+            ? packet.PacketType.ToString()
+            : $"({typeof(TPacketType).Name}){(byte)(object)packet.PacketType}";
+
+
+        Console.WriteLine(
+            $"#{_packetsLogged:D5} {sessionName,-5}  {participant1} {direction} {participant2}:  {handleStatus} {packetTypeString,-30}  {packet.Bytes.Length} bytes");
     }
 }

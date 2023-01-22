@@ -4,7 +4,7 @@ using L2sniffer.Packets.GS;
 
 namespace L2sniffer.L2PacketHandlers;
 
-public class GameServerPacketHandler : L2PacketHandlerBase<GameServerPacketBase>
+public class GameServerPacketHandler : L2PacketHandlerBase<GameServerPacketBase, GameServerPacketTypes>
 {
     private ISessionCryptKeysRegistry _cryptoKeysRegistry;
 
@@ -17,24 +17,18 @@ public class GameServerPacketHandler : L2PacketHandlerBase<GameServerPacketBase>
         _cryptoKeysRegistry = cryptoKeysRegistry;
     }
 
-    protected override void ProcessPacket(GameServerPacketBase packet)
+
+    protected override void RegisterHandlers(IHandlersRegistry handlerRegistry)
     {
-        switch (packet.PacketType)
-        {
-            case GameServerPacketTypes.CryptInit:
-                Handle(packet.As<CryptInitPacket>());
-                break;
-            default:
-                break;
-        }
+        handlerRegistry.RegisterHandler<CryptInitPacket>(GameServerPacketTypes.CryptInit, Handle);
     }
 
-    protected override IL2PacketDecryptor GetDecryptor(IPacketDecryptorProvider decryptorProvider, StreamId streamId)
+    protected override IL2PacketDecryptor SelectDecryptor(IPacketDecryptorProvider decryptorProvider, StreamId streamId)
     {
         return decryptorProvider.GetGameSessionDecryptor(streamId);
     }
 
-    private void Handle(CryptInitPacket cryptInitPacket)
+    private void Handle(CryptInitPacket cryptInitPacket, PacketMetainfo metainfo)
     {
         _cryptoKeysRegistry.RegisterGameSessionKey(this._streamId, cryptInitPacket.XorKey);
     }

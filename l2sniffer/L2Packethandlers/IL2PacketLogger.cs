@@ -4,5 +4,6 @@ namespace L2sniffer.L2PacketHandlers;
 
 public interface IL2PacketLogger
 {
-    void LogPacket(L2PacketBase packet, PacketMetainfo metainfo);
+    void LogHandledPacket(L2PacketBase packet, PacketMetainfo metainfo);
+    void LogUnhandledPacket(L2PacketBase packet, PacketMetainfo metainfo);
 }
