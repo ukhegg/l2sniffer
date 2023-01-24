@@ -10,11 +10,6 @@ public interface IL2PacketDecryptor
 
 public static class L2PacketDecryptorExtension
 {
-    public static L2PacketBase DecryptPacket(this IL2PacketDecryptor decryptor, L2PacketBase packet)
-    {
-        return new L2PacketBase(decryptor.DecryptPacket(packet.Bytes));
-    }
-
     public static T DecryptPacket<T>(this IL2PacketDecryptor? decryptor, ReadOnlySpan<byte> packetBytes)
         where T : L2PacketBase
     {

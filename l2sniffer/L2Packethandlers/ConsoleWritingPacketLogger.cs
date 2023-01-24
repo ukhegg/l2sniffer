@@ -6,6 +6,7 @@ using L2sniffer.Packets.GS;
 using L2sniffer.Packets.LC;
 using L2sniffer.Packets.LS;
 using Org.BouncyCastle.Bcpg;
+using SharpPcap;
 
 namespace L2sniffer.L2PacketHandlers;
 
@@ -13,6 +14,7 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
 {
     private ulong _packetsLogged = 0;
     private IL2ServerRegistry _serverRegistry;
+    private PosixTimeval _captureStart;
 
     public ConsoleWritingPacketLogger(IL2ServerRegistry serverRegistry)
     {
@@ -21,11 +23,19 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
 
     public void LogHandledPacket(L2PacketBase packet, PacketMetainfo metainfo)
     {
+        if (_packetsLogged == 0)
+        {
+            this._captureStart = metainfo.CaptureTime;
+        }
         LogPacket(packet, metainfo, true);
     }
 
     public void LogUnhandledPacket(L2PacketBase packet, PacketMetainfo metainfo)
     {
+        if (_packetsLogged == 0)
+        {
+            this._captureStart = metainfo.CaptureTime;
+        }
         LogPacket(packet, metainfo, false);
     }
 
@@ -55,7 +65,8 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
             }
             else
             {
-                Console.WriteLine($"#{_packetsLogged}: {packet.Bytes.Length} bytes");
+                var delta = (metainfo.CaptureTime.Value - _captureStart.Value);
+                Console.WriteLine($"+{delta}  #{_packetsLogged}: {packet.Bytes.Length} bytes");
             }
         }
         finally
@@ -71,6 +82,7 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
         var directionInfo = GetDirectionInfo<TPacketType>();
         HandlePacket(directionInfo.Item3, directionInfo.Item1, directionInfo.Item2, directionInfo.Item4,
                      packet,
+                     metainfo.CaptureTime,
                      isHandled);
     }
 
@@ -104,16 +116,23 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
                                            string participant2,
                                            string direction,
                                            TypeL2PacketBase<TPacketType> packet,
+                                           PosixTimeval captureTime,
                                            bool isHandled) where TPacketType : Enum
     {
         var handleStatus = isHandled ? '+' : '-';
 
+        if (!Enum.IsDefined(typeof(TPacketType), packet.PacketType))
+        {
+            Console.WriteLine();
+            Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
+        
         var packetTypeString = Enum.IsDefined(typeof(TPacketType), packet.PacketType)
-            ? packet.PacketType.ToString()
-            : $"({typeof(TPacketType).Name}){(byte)(object)packet.PacketType}";
+            ? $"{packet.PacketType.ToString()}(0x{(byte)(object)packet.PacketType:x2})"
+            : $"({typeof(TPacketType).Name})0x{(byte)(object)packet.PacketType:x2}??";
 
-
+        var delta = (captureTime.Value - _captureStart.Value);
         Console.WriteLine(
-            $"#{_packetsLogged:D5} {sessionName,-5}  {participant1} {direction} {participant2}:  {handleStatus} {packetTypeString,-30}  {packet.Bytes.Length} bytes");
+            $"+{delta}  #{_packetsLogged:D5} {sessionName,-5}  {participant1} {direction} {participant2}:  {handleStatus} {packetTypeString,-30}  {packet.Bytes.Length} bytes");
     }
 }

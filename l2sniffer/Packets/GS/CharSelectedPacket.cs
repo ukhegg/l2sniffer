@@ -2,7 +2,7 @@
 
 namespace L2sniffer.Packets.GS;
 
-public class CharSelectedPacket : GameServerPacketTypedPacket
+public class CharSelectedPacket : GameServerPacketBase
 {
     private SelectedCharInfo _selectedChar;
 

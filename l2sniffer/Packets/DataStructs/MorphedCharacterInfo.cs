@@ -1,10 +1,12 @@
-﻿namespace L2sniffer.Packets.DataStructs;
+﻿using L2sniffer.GameState.GameObjects;
+
+namespace L2sniffer.Packets.DataStructs;
 
 public class MorphedCharacterInfo : DataStruct
 {
-    public uint ObjectId;
+    public GameObjectId ObjectId;
     public uint NpcTypeId;
-    public uint PositiveCarma;
+    public uint IsAttackable;
     public Coordinates3d? Coordinates;
 
     public uint Heading;
@@ -26,7 +28,7 @@ public class MorphedCharacterInfo : DataStruct
     public byte IsRunning;
     public byte IsInCombat;
     public byte IsAlikeDead;
-    public byte InvisibleStatus;
+    public byte Issummoned;
     public string Name;
 
     public string Title;
@@ -39,7 +41,7 @@ public class MorphedCharacterInfo : DataStruct
     {
         reader.Read(out ObjectId);
         reader.Read(out NpcTypeId);
-        reader.Read(out PositiveCarma);
+        reader.Read(out IsAttackable);
         reader.Read(out Coordinates);
         reader.Read(out Heading);
         reader.Read(out uint _);
@@ -56,11 +58,18 @@ public class MorphedCharacterInfo : DataStruct
         reader.Read(out IsRunning);
         reader.Read(out IsInCombat);
         reader.Read(out IsAlikeDead);
-        reader.Read(out InvisibleStatus);
+        reader.Read(out Issummoned);
         reader.Read(out Name, FieldsReader.StringType.Ansii);
         reader.Read(out Title, FieldsReader.StringType.Ansii);
         reader.Skip(3 * sizeof(uint));
         reader.Read(out AbnormalEffect);
         reader.Skip(19);
     }
+
+    public bool IsNpcInfo()
+    {
+        return NpcTypeId > 1000000;
+    }
+
+    public uint RealNpcType => NpcTypeId - 1000000;
 }

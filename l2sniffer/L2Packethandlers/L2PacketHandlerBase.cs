@@ -94,8 +94,9 @@ public abstract class L2PacketHandlerBase<T, TTypeEnum> : IDatagramStreamHandler
         
         if (_packetHandlers.TryGetValue(packet.PacketType, out var handler))
         {
-            handler.Invoke(packet, metainfo);
             _packetLogger.LogHandledPacket(packet, metainfo);
+            handler.Invoke(packet, metainfo);
+            
         }
         else
         {

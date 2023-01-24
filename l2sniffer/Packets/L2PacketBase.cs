@@ -27,8 +27,9 @@ public class L2PacketBase
 
     public byte PacketTypeRaw { get; }
 
-    protected virtual void ReadPayloadFields(FieldsReader fieldsReader)
+    protected virtual void ReadPayloadFields(FieldsReader reader)
     {
+        
     }
 
     public T? As<T>() where T : L2PacketBase

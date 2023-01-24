@@ -35,4 +35,22 @@ public class Coordinates3d : DataStruct
     {
         return HashCode.Combine(X, Y, Z);
     }
+
+    public static Coordinates3d operator +(Coordinates3d a, Coordinates3d b)
+    {
+        return new Coordinates3d() { X = a.X + b.X, Y = a.Y + b.Y, Z = a.Z + b.Z };
+    }
+
+    public static Coordinates3d operator -(Coordinates3d a, Coordinates3d b)
+    {
+        return new Coordinates3d() { X = a.X - b.X, Y = a.Y - b.Y, Z = a.Z - b.Z };
+    }
+
+    public double DistanceTo(Coordinates3d other)
+    {
+        var dx = other.X - X;
+        var dy = other.Y - Y;
+        var dz = other.Z - Z;
+        return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+    }
 }

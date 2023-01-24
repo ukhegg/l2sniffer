@@ -1,4 +1,5 @@
 ﻿using L2sniffer.Crypto;
+using L2sniffer.GameState.GameObjects;
 using l2sniffer.PacketHandlers;
 using L2sniffer.StreamHandlers;
 
@@ -10,14 +11,20 @@ public class L2DatagramHandlerProvider : IDatagramStreamHandlerProvider
     private readonly ISessionCryptKeysRegistry _cryptoKeysRegistry;
     private readonly IL2ServerRegistry _serverRegistry;
     private IL2PacketLogger _packetLogger;
+    private IGameObjectsProvider _gameObjectsProvider;
+    private IGameObjectsRegistry _gameObjectRegistry;
 
     public L2DatagramHandlerProvider(IPacketDecryptorProvider packetDecryptorProvider,
                                      ISessionCryptKeysRegistry cryptoKeysRegistry,
                                      IL2ServerRegistry serverRegistry,
-                                     IL2PacketLogger packetLogger)
+                                     IL2PacketLogger packetLogger,
+                                     IGameObjectsProvider gameObjectsProvider, 
+                                     IGameObjectsRegistry gameObjectRegistry)
     {
         _packetDecryptorProvider = packetDecryptorProvider;
         _packetLogger = packetLogger;
+        _gameObjectsProvider = gameObjectsProvider;
+        _gameObjectRegistry = gameObjectRegistry;
         _serverRegistry = serverRegistry;
         _cryptoKeysRegistry = cryptoKeysRegistry;
     }
@@ -35,7 +42,9 @@ public class L2DatagramHandlerProvider : IDatagramStreamHandlerProvider
             return new GameServerPacketHandler(streamId,
                                                _cryptoKeysRegistry,
                                                _packetDecryptorProvider,
-                                               _packetLogger);
+                                               _packetLogger,
+                                               _gameObjectsProvider,
+                                               _gameObjectRegistry);
         }
 
         var dstEndpoint = streamId.DstEndpoint;

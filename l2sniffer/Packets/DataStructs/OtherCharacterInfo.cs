@@ -2,23 +2,8 @@
 
 public class OtherCharacterInfo : DataStruct
 {
-    public Coordinates3d Coordinates = null!;
-    public uint Heading;
-    public uint ObjectId;
-    public string Name;
-    public uint Race;
-    public uint Sex;
-    public uint ClassOrBaseClassId;
-    public uint Head;
-    public uint RHand;
-    public uint LHand;
-    public uint Gloves;
-    public uint Chest;
-    public uint Legs;
-    public uint Feet;
-    public uint Back;
-    public uint LRHand;
-    public uint Hair;
+    public BaseCharacterInfo BaseInfo;
+    public VisibleEquipment VisibleEquipment;
     public uint PvpFlag;
     public uint Carma;
     public uint MAttackSpeed;
@@ -42,8 +27,7 @@ public class OtherCharacterInfo : DataStruct
     public byte IsInvisible;
     public byte MountType;
     public byte PrivateStoreType;
-    public ushort CubicsSize;
-    public ushort[] Cubics;
+    public CubicInfo Cubics;
     public uint AbnormalEffect;
     public ushort RecommendationLevel;
     public byte MountedEnchantEffect;
@@ -54,24 +38,9 @@ public class OtherCharacterInfo : DataStruct
 
     public override void ReadFields(ref FieldsReader reader)
     {
-        reader.Read(out Coordinates);
-        reader.Read(out Heading);
-        reader.Read(out ObjectId);
-        reader.Read(out Name);
-        reader.Read(out Race);
-        reader.Read(out Sex);
-        reader.Read(out ClassOrBaseClassId);
+        reader.Read(out BaseInfo);
         reader.Read(out uint underwear);
-        reader.Read(out Head);
-        reader.Read(out RHand);
-        reader.Read(out LHand);
-        reader.Read(out Gloves);
-        reader.Read(out Chest);
-        reader.Read(out Legs);
-        reader.Read(out Feet);
-        reader.Read(out Back);
-        reader.Read(out LRHand);
-        reader.Read(out Hair);
+        reader.Read(out VisibleEquipment);
         reader.Read(out PvpFlag);
         reader.Read(out Carma);
         reader.Read(out MAttackSpeed);
@@ -98,9 +67,7 @@ public class OtherCharacterInfo : DataStruct
         reader.Read(out IsInvisible);
         reader.Read(out MountType);
         reader.Read(out PrivateStoreType);
-        reader.Read(out CubicsSize);
-        Cubics = new ushort[this.CubicsSize];
-        reader.Read(ref Cubics);
+        reader.Read(out Cubics);
         reader.Read(out byte findPartyMembers);
         reader.Read(out AbnormalEffect);
         reader.Read(out byte _);

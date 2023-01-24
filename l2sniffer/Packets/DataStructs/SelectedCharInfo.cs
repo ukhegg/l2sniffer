@@ -9,7 +9,7 @@ public class SelectedCharInfo : DataStruct
     public uint ClanId;
     public uint Sex;
     public uint Race;
-    public uint Class;
+    public CharacterClassIds Class;
     public uint Active;
     public Coordinates3d Coordinates;
     public double Hp;
@@ -30,7 +30,7 @@ public class SelectedCharInfo : DataStruct
         reader.Read(out uint _);
         reader.Read(out Sex);
         reader.Read(out Race);
-        reader.Read(out Class);
+        reader.ReadEnum(out Class);
         reader.Read(out Active);
         reader.Read(out Coordinates);
         reader.Read(out Hp);

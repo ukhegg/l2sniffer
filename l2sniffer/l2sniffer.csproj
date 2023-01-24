@@ -13,4 +13,40 @@
       <PackageReference Include="SharpPcap" Version="6.2.5" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="GameData\Data\itemname-e.txt" />
+      <EmbeddedResource Include="GameData\Data\itemname-e.txt">
+        <DependentUpon>Resources.resx</DependentUpon>
+      </EmbeddedResource>
+      <None Remove="GameData\Data\npcname-e.txt" />
+      <EmbeddedResource Include="GameData\Data\npcname-e.txt">
+        <DependentUpon>Resources.resx</DependentUpon>
+      </EmbeddedResource>
+      <None Remove="GameData\Data\skillname-e.txt" />
+      <EmbeddedResource Include="GameData\Data\skillname-e.txt">
+        <DependentUpon>Resources.resx</DependentUpon>
+      </EmbeddedResource>
+      <None Remove="GameData\Data\systemmsg-e.txt" />
+      <EmbeddedResource Include="GameData\Data\systemmsg-e.txt">
+        <DependentUpon>Resources.resx</DependentUpon>
+      </EmbeddedResource>
+      <None Remove="GameData\Data\actionname-e.txt" />
+      <EmbeddedResource Include="GameData\Data\actionname-e.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="GameData\Data\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="GameData\Data\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

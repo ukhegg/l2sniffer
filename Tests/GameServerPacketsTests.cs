@@ -70,7 +70,7 @@ public class GameServerPacketsTests
         Assert.That(bytes.Count, Is.EqualTo(182));
 
         var packet = new CharacterInfoPacket(bytes);
-        Assert.That(packet.PacketType, Is.EqualTo(GameServerPacketTypes.CharacterInfo));
+        Assert.That(packet.PacketType, Is.EqualTo(GameServerPacketTypes.NpcOrCharacterInfo));
 
         Assert.That(packet.CharacterInfo.Name, Is.Empty);
         Assert.That(packet.CharacterInfo.MovementSpeeds.RunSpeed, Is.EqualTo(150));
@@ -83,9 +83,25 @@ public class GameServerPacketsTests
         Assert.That(bytes.Count, Is.EqualTo(182));
 
         var packet = new CharacterInfoPacket(bytes);
-        Assert.That(packet.PacketType, Is.EqualTo(GameServerPacketTypes.CharacterInfo));
+        Assert.That(packet.PacketType, Is.EqualTo(GameServerPacketTypes.NpcOrCharacterInfo));
 
         Assert.That(packet.CharacterInfo.Name, Is.Empty);
         Assert.That(packet.CharacterInfo.MovementSpeeds.RunSpeed, Is.EqualTo(150));
+    }
+
+    [Test]
+    public void TestCanReadItemsListPacket()
+    {
+        var bytes = _testHelper.GetL2Packet("l2-1.pcap", _gameServerStream, _decryptor, 88);
+        Assert.That(bytes.Count, Is.EqualTo(2303));
+
+        var packet = new ItemsListPacket(bytes);
+        Assert.That(packet.PacketType, Is.EqualTo(GameServerPacketTypes.ItemsList));
+        
+        Assert.That(packet.Items.ShowWindow, Is.EqualTo(0x00));
+        Assert.That(packet.Items.Items.Length, Is.EqualTo(82));
+
+        Assert.That(packet.Items.Items[0].ItemId, Is.EqualTo(2074));
+        Assert.That(packet.Items.Items[0].ItemCount, Is.EqualTo(1));
     }
 }

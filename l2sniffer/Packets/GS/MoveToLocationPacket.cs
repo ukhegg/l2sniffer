@@ -1,4 +1,5 @@
-﻿using L2sniffer.Packets.DataStructs;
+﻿using L2sniffer.GameState.GameObjects;
+using L2sniffer.Packets.DataStructs;
 
 namespace L2sniffer.Packets.GS;
 
@@ -8,14 +9,14 @@ public class MoveToLocationPacket : GameServerPacketBase
     {
     }
 
-    public uint ObjectId;
+    public GameObjectId ObjectId;
     public Coordinates3d Dst;
     public Coordinates3d Current;
 
-    protected override void ReadPayloadFields(FieldsReader fieldsReader)
+    protected override void ReadPayloadFields(FieldsReader reader)
     {
-        fieldsReader.Read(out ObjectId);
-        fieldsReader.Read(out Dst);
-        fieldsReader.Read(out Current);
+        reader.Read(out ObjectId);
+        reader.Read(out Dst);
+        reader.Read(out Current);
     }
 }

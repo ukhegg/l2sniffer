@@ -1,8 +1,11 @@
 ﻿namespace L2sniffer.Packets;
 
-public class DataStruct
+public abstract class DataStruct
 {
-    public virtual void ReadFields(ref FieldsReader reader)
+    protected uint GetUintField()
     {
+        return 0;
     }
+
+    public abstract void ReadFields(ref FieldsReader reader);
 }

@@ -4,6 +4,17 @@ using PacketDotNet;
 
 namespace Tests;
 
+public class NonParserL2Packet : L2PacketBase
+{
+    public NonParserL2Packet(byte[] bytes) : base(bytes)
+    {
+    }
+
+    protected override void ReadPayloadFields(FieldsReader reader)
+    {
+        
+    }
+}
 public class LoginSessionCipherTests
 {
     private TestHelper _testHelper = new TestHelper();
@@ -12,7 +23,7 @@ public class LoginSessionCipherTests
     public void CanParseLoginInitPacket()
     {
         var packet = _testHelper.GetL2Packet("l2-1.pcap", 2);
-        var l2Packet = new L2PacketBase(packet.Item1);
+        var l2Packet = new NonParserL2Packet(packet.Item1);
 
 
         var cipher = new LoginSessionDecryptor();

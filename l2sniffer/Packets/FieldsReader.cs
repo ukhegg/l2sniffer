@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using L2sniffer.Utils;
 
 namespace L2sniffer.Packets;
 
@@ -30,6 +31,20 @@ public ref struct FieldsReader
         }
 
         val = new string(chars.ToArray());
+    }
+
+    public void Read(out char val)
+    {
+        val = (char)_packetData[0];
+        _packetData = _packetData.Slice(1);
+    }
+
+    public void Read(ref char[] val)
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            Read(out val[i]);
+        }
     }
 
     public void Read(out byte val)
@@ -158,6 +173,75 @@ public ref struct FieldsReader
             Read(out array[i]);
         }
     }
+
+    public void ReadEnum<T>(out T val) where T : Enum
+    {
+        if (Enum.GetUnderlyingType(typeof(T)) == typeof(byte))
+        {
+            byte _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+        else if (Enum.GetUnderlyingType(typeof(T)) == typeof(ushort))
+        {
+            ushort _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+
+        else if (Enum.GetUnderlyingType(typeof(T)) == typeof(uint))
+        {
+            uint _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+
+        else if (Enum.GetUnderlyingType(typeof(T)) == typeof(ulong))
+        {
+            ulong _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+
+        else if (Enum.GetUnderlyingType(typeof(T)) == typeof(char))
+        {
+            char _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+
+        else if (Enum.GetUnderlyingType(typeof(T)) == typeof(short))
+        {
+            short _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+
+        else if (Enum.GetUnderlyingType(typeof(T)) == typeof(int))
+        {
+            int _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+
+        else if (Enum.GetUnderlyingType(typeof(T)) == typeof(long))
+        {
+            long _;
+            Read(out _);
+            val = (T)(object)_;
+        }
+
+        else throw new Exception("unknown enum underlying type");
+    }
+
+    public void ReadEnum<T>(ref T[] val) where T : Enum, new()
+    {
+        for (var i = 0; i < val.Length; ++i)
+        {
+            ReadEnum(out val[i]);
+        }
+    }
+
 
     public void Skip<T>() where T : unmanaged
     {

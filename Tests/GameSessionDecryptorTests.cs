@@ -34,7 +34,7 @@ public class GameSessionDecryptorTests
         Assert.That(decrypted[1][2], Is.EqualTo((byte)GameServerPacketTypes.CharList));
         Assert.That(decrypted[2][2], Is.EqualTo((byte)GameServerPacketTypes.SignsSky));
         Assert.That(decrypted[3][2], Is.EqualTo((byte)GameServerPacketTypes.CharSelected));
-        Assert.That(decrypted[4][2], Is.EqualTo((byte)GameServerPacketTypes.ExSendManorList));
+        Assert.That(decrypted[4][2], Is.EqualTo((byte)GameServerPacketTypes.ExtendedCodes));
         Assert.That(decrypted[5][2], Is.EqualTo((byte)GameServerPacketTypes.QuestList));
     }
 }
