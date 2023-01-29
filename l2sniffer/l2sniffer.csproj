@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="BouncyCastle.Cryptography" Version="2.0.0" />
+      <PackageReference Include="ItsSimple.NetStatData" Version="1.0.0" />
       <PackageReference Include="Ninject" Version="4.0.0-beta.1" />
       <PackageReference Include="PacketDotNet" Version="1.4.8-pre15" />
       <PackageReference Include="SharpPcap" Version="6.2.5" />

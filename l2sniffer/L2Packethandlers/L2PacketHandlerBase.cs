@@ -91,26 +91,22 @@ public abstract class L2PacketHandlerBase<T, TTypeEnum> : IDatagramStreamHandler
 
     protected void ProcessPacket(T packet, PacketMetainfo metainfo)
     {
-        
         if (_packetHandlers.TryGetValue(packet.PacketType, out var handler))
         {
             _packetLogger.LogHandledPacket(packet, metainfo);
             handler.Invoke(packet, metainfo);
-            
         }
         else
         {
             _packetLogger.LogUnhandledPacket(packet, metainfo);
+            ProcessUnhandledPacket(packet, metainfo);
         }
     }
 
-    protected abstract IL2PacketDecryptor SelectDecryptor(IPacketDecryptorProvider decryptorProvider,
-                                                       StreamId streamId);
+    protected abstract void ProcessUnhandledPacket(T packet, PacketMetainfo metainfo);
 
-    protected void RegisterPacketHandler(TTypeEnum packetType, Action<T, PacketMetainfo> handler)
-    {
-        _packetHandlers[packetType] = handler;
-    }
+    protected abstract IL2PacketDecryptor SelectDecryptor(IPacketDecryptorProvider decryptorProvider,
+                                                          StreamId streamId);
 
     protected virtual void RegisterHandlers(IHandlersRegistry handlersRegistry)
     {

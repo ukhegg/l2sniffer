@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel;
+using System.Net;
 using System.Runtime.InteropServices;
 using L2sniffer.Packets;
 using L2sniffer.Packets.GC;
@@ -27,6 +28,7 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
         {
             this._captureStart = metainfo.CaptureTime;
         }
+
         LogPacket(packet, metainfo, true);
     }
 
@@ -36,6 +38,7 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
         {
             this._captureStart = metainfo.CaptureTime;
         }
+
         LogPacket(packet, metainfo, false);
     }
 
@@ -65,8 +68,8 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
             }
             else
             {
-                var delta = (metainfo.CaptureTime.Value - _captureStart.Value);
-                Console.WriteLine($"+{delta}  #{_packetsLogged}: {packet.Bytes.Length} bytes");
+                Console.WriteLine(
+                    $"+{GetCaptureTimeDelta(metainfo.CaptureTime)}  #{_packetsLogged}: {packet.Bytes.Length} bytes");
             }
         }
         finally
@@ -126,13 +129,21 @@ public class ConsoleWritingPacketLogger : IL2PacketLogger
             Console.WriteLine();
             Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
-        
+
         var packetTypeString = Enum.IsDefined(typeof(TPacketType), packet.PacketType)
             ? $"{packet.PacketType.ToString()}(0x{(byte)(object)packet.PacketType:x2})"
             : $"({typeof(TPacketType).Name})0x{(byte)(object)packet.PacketType:x2}??";
 
-        var delta = (captureTime.Value - _captureStart.Value);
+        var delta = GetCaptureTimeDelta(captureTime);
+        var absTime = DateTime.UnixEpoch.AddSeconds((uint)captureTime.Value);
         Console.WriteLine(
-            $"+{delta}  #{_packetsLogged:D5} {sessionName,-5}  {participant1} {direction} {participant2}:  {handleStatus} {packetTypeString,-30}  {packet.Bytes.Length} bytes");
+            $"{absTime}(+{delta})  #{_packetsLogged:D5} {sessionName,-5}  {participant1} {direction} {participant2}:  {handleStatus} {packetTypeString,-30}  {packet.Bytes.Length} bytes");
+    }
+
+    private string GetCaptureTimeDelta(PosixTimeval captureTime)
+    {
+        var dt = captureTime.Value - _captureStart.Value;
+        var timeSpan = new TimeSpan((long)dt * 10000000);
+        return timeSpan.ToString();
     }
 }

@@ -53,4 +53,9 @@ public class LoginServerPacketHandler : L2PacketHandlerBase<LoginServerPacketBas
     private void HandlePacket(PlayOkPacket initPacket, PacketMetainfo metainfo)
     {
     }
+
+    protected override void ProcessUnhandledPacket(LoginServerPacketBase packet, PacketMetainfo metainfo)
+    {
+        
+    }
 }

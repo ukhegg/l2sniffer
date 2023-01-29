@@ -11,7 +11,9 @@ public class Npc : GameObject
     private readonly IActionNameProvider _actionNameProvider;
     private readonly PlayerAttributes _attributes;
     private readonly IGameObjectsRegistry _objectsRegistry;
-
+    private MoveType _moveType = MoveType.Walk;
+    public GameObject Target { get; private set; }
+    
     public Npc(MorphedCharacterInfo info,
                NpcName name,
                IActionNameProvider actionNameProvider,
@@ -33,7 +35,7 @@ public class Npc : GameObject
 
     public override string ObjectName => $"NPC {_name.Name}";
 
-    public override void IfNpc(Action<Npc> callback)
+    public virtual void IfNpc(Action<Npc> callback)
     {
         callback(this);
     }
@@ -77,5 +79,15 @@ public class Npc : GameObject
             var nextTarget = _objectsRegistry.GetObject(hit.TargetId);
             Console.WriteLine($"        additional hit for {nextTarget.ObjectName},{hit.Damage} damage done");
         }
+    }
+
+    public override void SetMoveType(MoveType moveType)
+    {
+        this._moveType = moveType;
+    }
+    
+    public override void SetTarget(GameObject target, Coordinates3d targetCoordinates)
+    {
+        Target = target;
     }
 }

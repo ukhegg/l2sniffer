@@ -10,16 +10,19 @@ public class GameObjectsProvider : IGameObjectsProvider
     private INpcNameProvider _npcNameProvider;
     private Player _player;
     private IGameObjectsRegistry _objectsRegistry;
+    private ISkillInfoProvider _skillNameProvider;
 
     public GameObjectsProvider(IItemNameProvider itemNameProvider,
                                IActionNameProvider actionNameProvider,
                                INpcNameProvider npcNameProvider,
-                               IGameObjectsRegistry objectsRegistry)
+                               IGameObjectsRegistry objectsRegistry,
+                               ISkillInfoProvider skillNameProvider)
     {
         _itemNameProvider = itemNameProvider;
         _actionNameProvider = actionNameProvider;
         _npcNameProvider = npcNameProvider;
         _objectsRegistry = objectsRegistry;
+        _skillNameProvider = skillNameProvider;
     }
 
     public GameObject GetZeroObject()
@@ -27,9 +30,14 @@ public class GameObjectsProvider : IGameObjectsProvider
         return _player;
     }
 
-    public Player CreatePlayer(SelectedCharInfo charInfo)
+    public Player CreatePlayer(CharacterInfo characterInfo, SelectedCharInfo selectedInfo)
     {
-        _player = new Player(charInfo, _itemNameProvider, _actionNameProvider, _objectsRegistry);
+        _player = new Player(characterInfo,
+                             selectedInfo,
+                             _itemNameProvider,
+                             _actionNameProvider,
+                             _objectsRegistry,
+                             _skillNameProvider);
         return _player;
     }
 
@@ -46,5 +54,11 @@ public class GameObjectsProvider : IGameObjectsProvider
     public Npc CreateNpc(MorphedCharacterInfo info)
     {
         return new Npc(info, _npcNameProvider.GetNpcName(info.RealNpcType), _actionNameProvider, _objectsRegistry);
+    }
+
+    public Equipment CreateEquipment(GameObjectId objectId, uint itemId, uint count)
+    {
+        var itemInfo = _itemNameProvider.GetItem(itemId);
+        return new Equipment(objectId, itemInfo, count);
     }
 }

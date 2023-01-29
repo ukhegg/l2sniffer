@@ -24,7 +24,7 @@ public class GameObjectId : DataStruct, IComparable<GameObjectId>
     public override void ReadFields(ref FieldsReader reader)
     {
         reader.Read(out _id);
-        if (_id == 1251014542)
+        if (_id == 1075546479)
         {
             int a = 0;
         }

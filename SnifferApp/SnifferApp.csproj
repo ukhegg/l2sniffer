@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="ItsSimple.NetStatData" Version="1.0.0" />
       <PackageReference Include="LightInject" Version="6.6.3" />
       <PackageReference Include="PacketDotNet" Version="1.4.8-pre15" />
       <PackageReference Include="SharpPcap" Version="6.2.5" />

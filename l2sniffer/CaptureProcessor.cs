@@ -4,71 +4,115 @@ using SharpPcap;
 
 namespace L2sniffer;
 
-public class CaptureProcessor
+public class CaptureProcessor : ICaptureProcessor
 {
+    interface IRawCaptureHandler
+    {
+        public void ProcessCapture(PacketCapture capture);
+    }
+
+    class RawCaptureHandler<T> : IRawCaptureHandler
+        where T : Packet
+    {
+        private readonly IPacketHandler<T> _handler;
+        private ulong _packetsProcessed = 0;
+        private readonly ulong _startFrom;
+        private readonly ulong _stopAfter;
+        private ICaptureDevice _captureDevice;
+
+        public RawCaptureHandler(ICaptureDevice captureDevice,
+                                 IPacketHandler<T> handler,
+                                 ulong startFrom, ulong maxProcess)
+        {
+            _handler = handler;
+            _startFrom = startFrom;
+            _captureDevice = captureDevice;
+            _stopAfter = maxProcess == ulong.MaxValue ? ulong.MaxValue : startFrom + maxProcess;
+        }
+
+        public void ProcessCapture(PacketCapture capture)
+        {
+            try
+            {
+                if (_packetsProcessed < _startFrom) return;
+                if (_packetsProcessed > _stopAfter) return;
+
+                var realPacketsProcess = _packetsProcessed - _startFrom;
+                if (realPacketsProcess > 0 && realPacketsProcess % 200000 == 0)
+                {
+                    Console.WriteLine($"Processed {realPacketsProcess} packets,press any key to continue or q to stop");
+                    var k = Console.ReadKey();
+                    if (k.Key == ConsoleKey.Q)
+                    {
+                        Console.WriteLine("Stopping capture");
+                        _captureDevice.StopCapture();
+                        return;
+                    }
+
+                    Console.WriteLine("Continuing capture...");
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine();
+                }
+
+                var bytes = new ByteArraySegment(capture.Data.ToArray());
+                var packet = (T)Activator.CreateInstance(typeof(T), bytes);
+                _handler.HandlePacket(packet, GetBaseMetainfo(capture));
+            }
+            finally
+            {
+                _packetsProcessed++;
+            }
+        }
+
+        private PacketMetainfo GetBaseMetainfo(PacketCapture packetCapture)
+        {
+            return new PacketMetainfo
+            {
+                CaptureTime = packetCapture.Header.Timeval
+            };
+        }
+    }
+
     private IPacketHandlerProvider _packetHandlerProvider;
-    private IPacketHandler<EthernetPacket> _ethernetHandler = null!;
-    private IPacketHandler<IPv4Packet> _ipv4Handler = null!;
-    private IPacketHandler<IPv6Packet> _ipv6Handler = null!;
-    private ulong _skipPackets = 0;
-    private ulong _maxProcess = ulong.MaxValue;
-    private ulong _packetsProcessed = 0;
 
     public CaptureProcessor(IPacketHandlerProvider packetHandlerProvider)
     {
         _packetHandlerProvider = packetHandlerProvider;
     }
 
-    public void ProcessCapture(ICaptureDevice device, ulong skipPacket = 0, ulong maxProcess = ulong.MaxValue)
+    public void ProcessCaptureSync(ICaptureDevice device, ulong skipPacket = 0, ulong maxProcess = ulong.MaxValue)
     {
-        _skipPackets = skipPacket;
-        _maxProcess = maxProcess;
         var deviceEofEvent = new ManualResetEvent(false);
         device.OnCaptureStopped += (sender, status) => { deviceEofEvent.Set(); };
-        device.OnPacketArrival += this.GetCapturePacketHandler(device.LinkType);
-        device.StartCapture();
+        ProcessCaptureAsync(device, skipPacket, maxProcess);
         deviceEofEvent.WaitOne();
     }
 
-    private PacketArrivalEventHandler GetCapturePacketHandler(LinkLayers deviceLinkType)
+    public void ProcessCaptureAsync(ICaptureDevice device, ulong skipPacket = 0, ulong maxProcess = ulong.MaxValue)
     {
-        switch (deviceLinkType)
+        var handler = GetCaptureHandler(device, skipPacket, maxProcess);
+        device.OnPacketArrival += (sender, capture) => { handler.ProcessCapture(capture); };
+        device.StartCapture();
+    }
+
+    private IRawCaptureHandler GetCaptureHandler(ICaptureDevice captureDevice,
+                                                 ulong skipPacket,
+                                                 ulong maxProcess)
+    {
+        switch (captureDevice.LinkType)
         {
             case LinkLayers.Ethernet:
-                _ethernetHandler = _packetHandlerProvider.GetPacketHandler<EthernetPacket>();
-                return (sender, capture) => HandleCapture(capture, _ethernetHandler);
+                var ethernetHandler = _packetHandlerProvider.GetPacketHandler<EthernetPacket>();
+                return new RawCaptureHandler<EthernetPacket>(captureDevice, ethernetHandler, skipPacket, maxProcess);
             case LinkLayers.IPv4:
-                _ipv4Handler = _packetHandlerProvider.GetPacketHandler<IPv4Packet>();
-                return (sender, capture) => HandleCapture(capture, _ipv4Handler);
+                var ipv4Handler = _packetHandlerProvider.GetPacketHandler<IPv4Packet>();
+                return new RawCaptureHandler<IPv4Packet>(captureDevice, ipv4Handler, skipPacket, maxProcess);
             case LinkLayers.IPv6:
-                _ipv6Handler = _packetHandlerProvider.GetPacketHandler<IPv6Packet>();
-                return (sender, capture) => HandleCapture(capture, _ipv6Handler);
+                var ipv6Handler = _packetHandlerProvider.GetPacketHandler<IPv6Packet>();
+                return new RawCaptureHandler<IPv6Packet>(captureDevice, ipv6Handler, skipPacket, maxProcess);
             default:
-                throw new NotImplementedException($"link layer {deviceLinkType} not yet implemented");
+                throw new NotImplementedException($"link layer {captureDevice.LinkType} not yet implemented");
         }
-    }
-
-    private void HandleCapture<T>(PacketCapture e, IPacketHandler<T> handler)
-    {
-        try
-        {
-            if (_packetsProcessed < _skipPackets) return;
-            if (_packetsProcessed > _skipPackets + _maxProcess) return;
-            var bytes = new ByteArraySegment(e.Data.ToArray());
-            var packet = (T)Activator.CreateInstance(typeof(T), bytes);
-            handler.HandlePacket(packet, GetBaseMetainfo(e));
-        }
-        finally
-        {
-            _packetsProcessed++;
-        }
-    }
-
-    private PacketMetainfo GetBaseMetainfo(PacketCapture packetCapture)
-    {
-        return new PacketMetainfo
-        {
-            CaptureTime = packetCapture.Header.Timeval
-        };
     }
 }

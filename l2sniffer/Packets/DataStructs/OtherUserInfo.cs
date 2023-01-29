@@ -5,7 +5,7 @@ namespace L2sniffer.Packets.DataStructs;
 public class OtherUserInfo : DataStruct
 {
     public Coordinates3d Coordinates;
-    public uint Heading;
+    public int Heading;
     public GameObjectId ObjectId;
     public string Name;
     public RaceTypes Race;

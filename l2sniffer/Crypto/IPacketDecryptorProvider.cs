@@ -6,5 +6,6 @@ public interface IPacketDecryptorProvider
 {
     IL2PacketDecryptor GetGameSessionDecryptor(StreamId gameStreamId);
 
-    IL2PacketDecryptor? GetLoginSessionDecryptor(StreamId loginStreamId);
+    IL2PacketDecryptor GetLoginSessionDecryptor(StreamId loginStreamId);
 }
+

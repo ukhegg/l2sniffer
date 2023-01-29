@@ -3,17 +3,15 @@ using L2sniffer.Packets.DataStructs;
 
 namespace L2sniffer.GameState.GameObjects;
 
-public class OtherPlayer : GameObject
+public class OtherPlayer : HumanPlayer
 {
     private readonly IActionNameProvider _actionNameProvider;
-    private readonly PlayerAttributes _attributes;
-
+    
     public OtherPlayer(OtherUserInfo otherUserPlayerInfo,
                        IActionNameProvider actionNameProvider)
         : base(otherUserPlayerInfo.ObjectId)
     {
         _actionNameProvider = actionNameProvider;
-        _attributes = new PlayerAttributes();
         _attributes.Update(otherUserPlayerInfo);
         _attributes.DictionaryChanged += (sender, args) =>
         {
@@ -24,9 +22,11 @@ public class OtherPlayer : GameObject
 
     public OtherUserInfo PlayerInfo { get; private set; }
 
-    public string Name => PlayerInfo.Name;
+    public override string Name => PlayerInfo.Name;
 
-    public override void IfOtherPlayer(Action<OtherPlayer> callback)
+    public override string ObjectName => $"Other player \'{Name}\'";
+
+    public virtual void IfOtherPlayer(Action<OtherPlayer> callback)
     {
         callback(this);
     }
@@ -47,6 +47,8 @@ public class OtherPlayer : GameObject
         _attributes.Update(charStatus);
     }
 
+
+
     public override void MoveToLocation(Coordinates3d current, Coordinates3d dst)
     {
         Console.WriteLine($"    \'{PlayerInfo.Name}\' is moving from {current} to {dst}");
@@ -65,4 +67,11 @@ public class OtherPlayer : GameObject
         var actionName = _actionNameProvider.GetActionName(actionId);
         Console.WriteLine($"    player {this.Name} is performing action {actionId}");
     }
+
+    public override void StopRotation(int degree)
+    {
+        PlayerInfo.Heading += degree;
+    }
+    
+
 }

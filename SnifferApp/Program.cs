@@ -22,16 +22,20 @@ namespace SnifferApp
             Console.WriteLine();
             // read the file from stdin or from the command line arguments
             string capFile = "C:/Games/l2big.pcap";
-            Console.WriteLine("opening '{0}'", capFile);
-
+            //Console.WriteLine("opening '{0}'", capFile);
+ 
             ICaptureDevice device;
 
             try
             {
                 // Get an offline device
-                device = new CaptureFileReaderDevice(capFile);
+                //device = new CaptureFileReaderDevice(capFile);
+                var interfaces = PcapInterface.GetAllPcapInterfaces();
+                var targetInterface = interfaces.FirstOrDefault(@interface => @interface.FriendlyName == "Wi-Fi 2");
+                device = new LibPcapLiveDevice(targetInterface);
                 // Open the device
                 device.Open();
+                device.Filter = "tcp and host 83.166.99.220";
             }
             catch (Exception e)
             {
@@ -56,8 +60,11 @@ namespace SnifferApp
             kernel.Bind<string>().ToConstant("itemname-e.txt").WhenInjectedInto<ItemNameProvider>();
             kernel.Bind<IActionNameProvider>().To<ActionNameProvider>().InSingletonScope();
             kernel.Bind<string>().ToConstant("actionname-e.txt").WhenInjectedInto<ActionNameProvider>();
+            kernel.Bind<ISkillInfoProvider>().To<SkillInfoProvider>().InSingletonScope();
+            kernel.Bind<string>().ToConstant("skillname-e.txt").WhenInjectedInto<SkillInfoProvider>();
             kernel.Bind<IGameObjectsProvider>().To<GameObjectsProvider>().InSingletonScope();
             kernel.Bind<IGameObjectsRegistry>().To<GameObjectRegistry>().InSingletonScope();
+            kernel.Bind<IGameSessionProvider>().To<GameSessionProvider>().InSingletonScope();
 
 
             //packet handlers bindings
@@ -87,7 +94,7 @@ namespace SnifferApp
             kernel.Get<IL2ServerRegistry>().RegisterLoginServer(
                 new IPEndPoint(IPAddress.Parse("83.166.99.220"), 2106));
 
-            kernel.Get<CaptureProcessor>().ProcessCapture(device, 0);
+            kernel.Get<CaptureProcessor>().ProcessCaptureSync(device, 0);
 
             Console.WriteLine();
             Console.WriteLine("Read done!");

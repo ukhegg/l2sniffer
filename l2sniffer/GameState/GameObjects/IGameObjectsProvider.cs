@@ -4,13 +4,13 @@ namespace L2sniffer.GameState.GameObjects;
 
 public interface IGameObjectsProvider
 {
-    Player CreatePlayer(SelectedCharInfo charInfo);
+    Player CreatePlayer(CharacterInfo characterInfo, SelectedCharInfo selectedInfo);
 
     OtherPlayer CreateOtherPlayer(OtherUserInfo charInfo);
 
     MorphedCharacter CreateMorphed(MorphedCharacterInfo charInfo);
 
     Npc CreateNpc(MorphedCharacterInfo info);
-    
-    GameObject GetZeroObject();
+
+    Equipment CreateEquipment(GameObjectId objectId, uint itemId, uint count);
 }

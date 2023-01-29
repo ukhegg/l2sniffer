@@ -23,4 +23,9 @@ public class LoginClientPacketHandler : L2PacketHandlerBase<LoginClientPacketBas
     {
         return decryptorProvider.GetLoginSessionDecryptor(streamId);
     }
+
+    protected override void ProcessUnhandledPacket(LoginClientPacketBase packet, PacketMetainfo metainfo)
+    {
+        
+    }
 }

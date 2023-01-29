@@ -16,7 +16,7 @@ public class MorphedCharacter : GameObject
         Location = Info.Coordinates;
     }
 
-    public override void IfMorphedChar(Action<MorphedCharacter> callback)
+    public virtual void IfMorphedChar(Action<MorphedCharacter> callback)
     {
         callback(this);
     }

@@ -11,7 +11,7 @@ public class CharacterInfo : DataStruct
     public uint Unknown1;
     public uint Gendre;
     public uint Race;
-    public uint Klass;
+    public CharacterClassIds Klass;
     public uint IsActive;
     public Coordinates3d CoordinatedUnused;
     public double Hp;
@@ -43,7 +43,7 @@ public class CharacterInfo : DataStruct
         reader.Read(out this.Unknown1);
         reader.Read(out this.Gendre);
         reader.Read(out this.Race);
-        reader.Read(out this.Klass);
+        reader.ReadEnum(out this.Klass);
         reader.Read(out this.IsActive);
         reader.Read(out this.CoordinatedUnused);
         reader.Read(out this.Hp);

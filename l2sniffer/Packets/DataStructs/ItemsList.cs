@@ -1,4 +1,7 @@
-﻿namespace L2sniffer.Packets.DataStructs;
+﻿using L2sniffer.GameState;
+using L2sniffer.GameState.GameObjects;
+
+namespace L2sniffer.Packets.DataStructs;
 
 public enum BodyPartTypes : uint
 {
@@ -25,7 +28,7 @@ public class ItemsListEntry : DataStruct
     }
 
     public ushort ItemType;
-    public uint ObjectId;
+    public GameObjectId ObjectId;
     public uint ItemId;
     public uint ItemCount;
     public ushort ItemType2;
@@ -48,8 +51,6 @@ public class ItemsListEntry : DataStruct
         reader.Read(out EnchantLevel);
         reader.Read(out CustomType2);
     }
-    
-    
 }
 
 public class ItemsList : DataStruct
@@ -66,5 +67,24 @@ public class ItemsList : DataStruct
         {
             reader.Read(out Items[i]);
         }
+    }
+}
+
+public class ItemListEntryChange : DataStruct
+{
+    public enum ChangeTypes : ushort
+    {
+        Add = 0x01,
+        Modify = 0x02,
+        Remove = 0x03
+    }
+
+    public ChangeTypes ChangeType;
+    public ItemsListEntry Item;
+
+    public override void ReadFields(ref FieldsReader reader)
+    {
+        reader.ReadEnum(out ChangeType);
+        reader.Read(out Item);
     }
 }

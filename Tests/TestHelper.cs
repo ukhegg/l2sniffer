@@ -101,7 +101,7 @@ public class TestHelper
 
             
 
-            kernel.Get<CaptureProcessor>().ProcessCapture(device);
+            kernel.Get<CaptureProcessor>().ProcessCaptureSync(device);
             return datagramAccumulator.Datagrams;
         }
         catch (Exception e)

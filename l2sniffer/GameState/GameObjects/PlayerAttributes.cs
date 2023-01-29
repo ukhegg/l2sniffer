@@ -103,6 +103,17 @@ public class PlayerAttributes : IReadOnlyDictionary<UpdateAttributeTypes, uint>,
         }
     }
     
+    public void Update(PartyMemberInfo partyMemberInfo)
+    {
+        UpdateAttribute(UpdateAttributeTypes.CurCp, partyMemberInfo.CurrentCp);
+        UpdateAttribute(UpdateAttributeTypes.CurHp, partyMemberInfo.CurrentHp);
+        UpdateAttribute(UpdateAttributeTypes.CurMp, partyMemberInfo.CurrentMp);
+        UpdateAttribute(UpdateAttributeTypes.MaxCp, partyMemberInfo.MaxCp);
+        UpdateAttribute(UpdateAttributeTypes.MaxHp, partyMemberInfo.MaxHp);
+        UpdateAttribute(UpdateAttributeTypes.MaxMp, partyMemberInfo.MaxMp);
+        UpdateAttribute(UpdateAttributeTypes.Level, partyMemberInfo.Level);
+    }
+    
     IEnumerator IEnumerable.GetEnumerator()
     {
         return _attributes.GetEnumerator();
@@ -132,6 +143,7 @@ public class PlayerAttributes : IReadOnlyDictionary<UpdateAttributeTypes, uint>,
     public IEnumerable<uint> Values => _attributes.Values;
 
     public event EventHandler<NotifyDictionaryChangedEventArgs<UpdateAttributeTypes, uint>>? DictionaryChanged;
+
 
 
 }
