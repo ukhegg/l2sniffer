@@ -46,19 +46,37 @@ enum L2_SESSION_TYPES{
   Game = 1;
 }
 
-message GetL2SessionsNotificationsReply{
-  string SessionIdentifier = 1;
-  L2_SESSION_TYPES SessionType = 2;
-  string ServerIp = 3;
-  uint32 ServerPort = 4;
-  string ClientIp = 5;
-  uint32 ClientPort = 6;
+message L2SessionId
+{
+  string ServerIp = 1;
+  uint32 ServerPort = 2;
+  string ClientIp = 3;
+  uint32 ClientPort = 4;
 }
 
 enum SessionDirections
 {
   ClientToServer = 0;
   ServerToClient = 1;
+}
+
+message GetL2SessionsNotificationsReply{
+  L2_SESSION_TYPES SessionType = 1;
+  L2SessionId SessionId = 2;
+  SessionDirections Direction = 3;
+}
+
+
+message GetL2SessionPacketsRequest
+{
+  L2SessionId SessionId = 1;
+  SessionDirections Direction = 2;
+}
+
+message GetL2SessionPacketsReply
+{
+  bytes PacketBytes = 1;
+  uint64 CaptureTime = 2;
 }
 
 service SniffingService
@@ -68,6 +86,8 @@ service SniffingService
   rpc StopSniffing(StopSniffingRequest) returns (StopSniffingReply);
 
   rpc GetStatus(GetStatusRequest) returns (GetStatusReply);
-  
+
   rpc ReceiveL2SessionsNotifications(GetL2SessionsNotificationsRequest) returns (stream GetL2SessionsNotificationsReply);
+
+  rpc GetL2SessionPackets(GetL2SessionPacketsRequest) returns (stream GetL2SessionPacketsReply);
 }

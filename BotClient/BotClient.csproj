@@ -19,4 +19,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\L2sniffer\L2sniffer.csproj" />
+    </ItemGroup>
 </Project>

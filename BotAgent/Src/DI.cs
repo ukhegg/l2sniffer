@@ -21,6 +21,7 @@ public class DI
         services.TryAddSingleton(kernel.Get<INetworkSniffer>());
         services.TryAddSingleton(kernel.Get<IL2ServerRegistry>());
         services.TryAddSingleton(kernel.Get<INotifyL2SessionFound>());
+        services.TryAddSingleton(kernel.Get<IL2SessionPacketAsyncProvider>());
     }
 
     static IKernel GetKernel()
@@ -39,6 +40,7 @@ public class DI
         var l2StreamHandlerProvider = kernel.Get<L2StreamHandlerProvider>();
         kernel.Bind<IL2StreamsHandlerProvider>().ToMethod(context => l2StreamHandlerProvider);
         kernel.Bind<INotifyL2SessionFound>().ToMethod(context => l2StreamHandlerProvider);
+        kernel.Bind<IL2SessionPacketAsyncProvider>().ToMethod(context => l2StreamHandlerProvider);
 
 //infrustructure
         kernel.Bind<IL2PacketLogger>().To<ConsoleWritingPacketLogger>();
@@ -68,7 +70,7 @@ public class DI
         handlerRegistry.RegisterPacketHandler(kernel.Get<IPacketHandler<IPv4Packet>>());
         handlerRegistry.RegisterPacketHandler(kernel.Get<IPacketHandler<TcpPacket>>());
 
-        
+
         return kernel;
     }
 }
