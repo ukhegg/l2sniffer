@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+
+option csharp_namespace = "BotAgent";
+
+package L2Bot;
+
+message NullableUint32 {
+  oneof Kind {
+    google.protobuf.NullValue Null = 1;
+    uint32 Value = 2;
+  }
+}
+
+message StartSniffingRequest{
+  string ServerIp = 1;
+  uint32 LoginServerPort = 2;
+  NullableUint32 GameServerPort = 3;
+}
+
+message StartSniffingReply{
+  bool Success = 1;
+  string CapturingOnInterface = 2;
+  string ErrorMessage = 3;
+}
+
+message StopSniffingRequest{}
+
+message StopSniffingReply{
+  bool Success = 1;
+  string ErrorMessage = 2;
+}
+
+message GetStatusRequest{}
+
+message GetStatusReply{
+  bool Running = 1;
+  string SniffingServer = 2;
+}
+
+message GetL2SessionsNotificationsRequest{}
+
+enum L2_SESSION_TYPES{
+  Login = 0;
+  Game = 1;
+}
+
+message GetL2SessionsNotificationsReply{
+  string SessionIdentifier = 1;
+  L2_SESSION_TYPES SessionType = 2;
+  string ServerIp = 3;
+  uint32 ServerPort = 4;
+  string ClientIp = 5;
+  uint32 ClientPort = 6;
+}
+
+enum SessionDirections
+{
+  ClientToServer = 0;
+  ServerToClient = 1;
+}
+
+service SniffingService
+{
+  rpc StartSniffing(StartSniffingRequest) returns (StartSniffingReply);
+
+  rpc StopSniffing(StopSniffingRequest) returns (StopSniffingReply);
+
+  rpc GetStatus(GetStatusRequest) returns (GetStatusReply);
+  
+  rpc ReceiveL2SessionsNotifications(GetL2SessionsNotificationsRequest) returns (stream GetL2SessionsNotificationsReply);
+}
